@@ -1,7 +1,11 @@
 node_modules
 .DS_Store
 dist
+vise
 dist-ssr
-*.local
 
-/vise/*
+*.local
+*.log
+*.lock
+*.zip
+*.rar
