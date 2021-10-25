@@ -1,5 +1,5 @@
 <template>
-  <div class="app-wrapper">
+  <div class="app-wrapper" :class="[$store.state.slider.putAway && 'put-away']">
     <aside>
       <Logo />
       <Slidebar :list="routes" :hiddenName="compName" />
@@ -19,14 +19,15 @@
 </template>
 
 <script lang='ts'>
-import Slidebar from './Slidebar/index.vue';
-import Navbar from './Navbar/index.vue';
-import Logo from './Logo/index.vue';
 import RouterCache from '@/components/RouterCache/index.vue';
-import Tabs from './Tabs/index.vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useStore } from 'vuex';
-import { ref, watch } from 'vue';
+import Slidebar from './components/Slidebar/index.vue';
+import Navbar from './components/Navbar/index.vue';
+import Logo from './components/Logo/index.vue';
+import Tabs from './components/Tabs/index.vue';
+
+import watchSlider from './ts/watch-slider';
+import watchLogin from './ts/watch-login';
+import disposeRouter from './ts/dispose-router';
 
 export default {
   components: {
@@ -37,66 +38,10 @@ export default {
     Tabs
   },
   setup() {
-    const $store = useStore();
-    const role = $store.state.user.role;
-    const $router = useRouter();
-    const $route = useRoute();
-    const newRoutes = ref();
-    const { routes } = $router.options
-    for (let i = 0; i < routes.length; i++) {
-      if (routes[i].name === 'Layout') {
-        newRoutes.value = routes[i].children;
-        continue;
-      }
-    }
-
-    // 监听要隐藏的菜单，发生变化即重新渲染
-    const compName = ref();
-    watch(
-      () => $store.state.slider.hiddenSlider,
-      (newValue) => {
-        compName.value = newValue;
-      },
-      { deep: true }
-    );
-
-
-    (async () => {
-      const token = $store.state.user.token;
-      if (!token) {
-        $router.replace('/login');
-      }
-    })()
-    // 监听状态，处理登录状况
-    watch(
-      () => $store.state.user.token,
-      (value) => {
-        if (!value) {
-          const redirectHref = $route.path;
-          $router.replace(`/login?redirect=${redirectHref}`);
-        }
-      }
-    )
-
-    // 递归处理侧边栏要显示的路由
-    function dispose(routes: any) {
-      for (let i = 0; i < routes.length; i++) {
-        const meta = routes[i].meta;
-        if (meta === undefined || meta === null) continue;
-        if (meta?.roles) {
-          const flag = meta.roles.includes(role);
-          if (!flag) routes[i].hidden = true;
-        }
-        if (routes[i].children) {
-          dispose(routes[i].children);
-        }
-      }
-      return routes;
-    }
-
     return {
-      routes: dispose(newRoutes),
-      compName,
+      ...disposeRouter(),
+      ...watchSlider(),
+      ...watchLogin()
     }
   }
 }
@@ -117,6 +62,11 @@ export default {
   }
   section{
     width: 100%;
+  }
+  &.put-away{
+    aside{
+      width: 60px;
+    }
   }
 }
 

@@ -12,13 +12,13 @@ export default {
       path: 'home',
       name: 'Home',
       component: Home,
-      meta: { title: '首页', affix: true },
+      meta: { title: '首页', icon: '&#xe64f;', affix: true },
     },
     {
       path: 'server',
       name: 'Server',
       component: () => import('../views/server/index.vue'),
-      meta: { title: '服务器', affix: true },
+      meta: { title: '服务器', icon: '&#xe60b;', affix: true },
       children: [
         {
           path: 'cpu',
@@ -38,13 +38,13 @@ export default {
       path: 'role-manage',
       name: 'RoleManage',
       component: () => import('../views/role-manage/index.vue'),
-      meta: { title: '菜单分配', roles: ['admin'] },
+      meta: { title: '菜单分配', icon: '&#xe623;', roles: ['admin'] },
     },
     {
       path: 'users',
       name: 'User',
       component: () => import('../views/user/User.vue'),
-      meta: { title: '一级导航', roles: ['admin'] },
+      meta: { title: '一级导航', icon: '&#xe638;', roles: ['admin'] },
       children: [
         {
           path: '',
